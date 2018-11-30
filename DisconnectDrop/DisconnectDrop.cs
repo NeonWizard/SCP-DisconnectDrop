@@ -2,15 +2,15 @@
 using Smod2.Attributes;
 using Smod2.EventHandlers;
 using Smod2.Events;
-using System.Collections.Generic;
+using Smod2.Config;
 
 namespace DisconnectDrop
 {
     [PluginDetails(
         author = "Spooky",
-        name = "DeathDrop",
+        name = "DisconnectDrop",
         description = "Drops player items on disconnection.",
-        id = "xyz.wizardlywonders.DeathDrop",
+        id = "xyz.wizardlywonders.DisconnectDrop",
         version = "1.0",
         SmodMajor = 3,
         SmodMinor = 1,
@@ -31,7 +31,7 @@ namespace DisconnectDrop
         public override void Register()
         {
             // Register config settings
-            //this.AddConfig(new Smod2.Config.ConfigSetting("test", "yes", Smod2.Config.SettingType.STRING, true, "test"));
+            this.AddConfig(new ConfigSetting("ddrop_inventory_refreshrate", "2", SettingType.NUMERIC, true, "How often player inventories are cached (in seconds)."));
 
             // Register events
             this.AddEventHandler(typeof(IEventHandlerDisconnect), new DisconnectEventHandler(this), Priority.Highest);
