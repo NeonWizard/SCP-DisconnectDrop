@@ -7,12 +7,13 @@ using System;
 
 namespace DisconnectDrop
 {
-    class DisconnectEventHandler : IEventHandlerDisconnect, IEventHandlerFixedUpdate
+    class DisconnectEventHandler : IEventHandlerPlayerJoin, IEventHandlerDisconnect, IEventHandlerFixedUpdate
     {
         private Plugin plugin;
 
         private float pTime;
-        public Dictionary<string, List<Smod2.API.Item>> inventories;
+        public Dictionary<string, List<Smod2.API.Item>> inventories; // steamId: inventory
+        public Dictionary<string, List<float>> locations;            // steamId: x, y, z
 
         public DisconnectEventHandler(Plugin plugin)
         {
@@ -20,11 +21,41 @@ namespace DisconnectDrop
 
             this.pTime = 0;
             this.inventories = new Dictionary<string, List<Smod2.API.Item>>();
+            this.locations = new Dictionary<string, List<float>>();
+        }
+
+        public void OnPlayerJoin(PlayerJoinEvent ev)
+        {
+            inventories.Add(ev.Player.SteamId, new List<Smod2.API.Item>());
+            locations.Add(ev.Player.SteamId, new List<float>() {0, 0, 0} );
         }
 
         public void OnDisconnect(DisconnectEvent ev)
         {
-            throw new System.NotImplementedException();
+            //plugin.Info("Player disconnected. Searching for player...");
+            foreach (var inv in inventories)
+            {
+                bool hasfound = false;
+                foreach (var player in plugin.Server.GetPlayers())
+                {
+                    if (player.SteamId == inv.Key)
+                    {
+                        hasfound = true;
+                        break;
+                    }
+                }
+                if (!hasfound)
+                {
+                    //plugin.Info("Player found.");
+                    // Drop player's cached inventory
+                    foreach (var item in inv.Value)
+                    {
+                        var loc = locations[inv.Key];
+                        item.SetPosition(new Smod2.API.Vector( loc[0], loc[1], loc[2] ));
+                        item.Drop();
+                    }
+                }
+            }
         }
 
         public void OnFixedUpdate(FixedUpdateEvent ev)
@@ -42,9 +73,9 @@ namespace DisconnectDrop
                         var player = players[i];
                         var obj = (GameObject)players[i].GetGameObject();
 
-                        // '[i] = x' as opposed to .Add because we want to override old values
                         inventories[player.SteamId] = player.GetInventory();
-                    }
+                        locations[player.SteamId] = new List<float>{ obj.transform.position.x, obj.transform.position.y, obj.transform.position.z };
+                    };
                 }
                 catch (Exception e)
                 {
