@@ -31,10 +31,10 @@ namespace DisconnectDrop
         public override void Register()
         {
             // Register config settings
-            this.AddConfig(new ConfigSetting("ddrop_inventory_refreshrate", "2", SettingType.NUMERIC, true, "How often player inventories are cached (in seconds)."));
+            this.AddConfig(new ConfigSetting("ddrop_inventory_refreshrate", 1, SettingType.NUMERIC, true, "How often player inventories are cached (in seconds)."));
 
             // Register events
-            this.AddEventHandler(typeof(IEventHandlerDisconnect), new DisconnectEventHandler(this), Priority.Highest);
+            this.AddEventHandlers(new DisconnectEventHandler(this), Priority.Normal);
         }
     }
 }

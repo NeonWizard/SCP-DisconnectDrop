@@ -26,13 +26,14 @@ namespace DisconnectDrop
 
         public void OnPlayerJoin(PlayerJoinEvent ev)
         {
+            plugin.Info("Player joined, creating cache entries.");
             inventories.Add(ev.Player.SteamId, new List<Smod2.API.Item>());
             locations.Add(ev.Player.SteamId, new List<float>() {0, 0, 0} );
         }
 
         public void OnDisconnect(DisconnectEvent ev)
         {
-            //plugin.Info("Player disconnected. Searching for player...");
+            plugin.Info("Player disconnected, searching for player...");
             foreach (var inv in inventories)
             {
                 bool hasfound = false;
@@ -46,14 +47,20 @@ namespace DisconnectDrop
                 }
                 if (!hasfound)
                 {
-                    //plugin.Info("Player found.");
+                    plugin.Info("Player found.");
                     // Drop player's cached inventory
                     foreach (var item in inv.Value)
                     {
                         var loc = locations[inv.Key];
+                        plugin.Info("Dropping at location " + loc[0] + ":" + loc[1] + ":" + loc[2]);
                         item.SetPosition(new Smod2.API.Vector( loc[0], loc[1], loc[2] ));
                         item.Drop();
                     }
+
+                    // Remove player entries
+                    inventories.Remove(inv.Key);
+                    locations.Remove(inv.Key);
+                    break;
                 }
             }
         }
@@ -65,13 +72,14 @@ namespace DisconnectDrop
             if (pTime < 0)
             {
                 pTime = ConfigManager.Manager.Config.GetIntValue("ddrop_inventory_refreshrate", 1);
+
                 try
                 {
                     var players = plugin.Server.GetPlayers();
                     for (int i = 0; i < players.Count; i++)
                     {
                         var player = players[i];
-                        var obj = (GameObject)players[i].GetGameObject();
+                        var obj = (GameObject)player.GetGameObject();
 
                         inventories[player.SteamId] = player.GetInventory();
                         locations[player.SteamId] = new List<float>{ obj.transform.position.x, obj.transform.position.y, obj.transform.position.z };
