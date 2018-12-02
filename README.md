@@ -15,7 +15,7 @@ ServerMod is a server side plugin system with a bunch of additional configuratio
 ## Configuration
 Config Option | Value Type | Default Value | Description
 --- | :---: | :---: | ---
-ddrop_inventory_refreshrate | Int | 1 | How often player inventories are cached (in seconds).
+ddrop_inventory_refreshrate | Int | 2 | How often player inventories are cached (in seconds).
 
 *Note that all configs should go in your server config file, not config_remoteadmin.txt
 

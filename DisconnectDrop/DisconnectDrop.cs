@@ -25,13 +25,12 @@ namespace DisconnectDrop
         public override void OnEnable()
         {
             this.Info("DisconnectDrop has loaded successfully.");
-            //this.Info("Config value: " + this.GetConfigString("test"));
         }
 
         public override void Register()
         {
             // Register config settings
-            this.AddConfig(new ConfigSetting("ddrop_inventory_refreshrate", 1, SettingType.NUMERIC, true, "How often player inventories are cached (in seconds)."));
+            this.AddConfig(new ConfigSetting("ddrop_inventory_refreshrate", 2, SettingType.NUMERIC, true, "How often player inventories are cached (in seconds)."));
 
             // Register events
             this.AddEventHandlers(new DisconnectEventHandler(this));

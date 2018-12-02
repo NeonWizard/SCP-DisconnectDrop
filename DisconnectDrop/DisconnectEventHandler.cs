@@ -81,7 +81,7 @@ namespace DisconnectDrop
             pTime -= Time.fixedDeltaTime;
             if (pTime < 0)
             {
-                pTime = ConfigManager.Manager.Config.GetIntValue("ddrop_inventory_refreshrate", 1);
+                pTime = ConfigManager.Manager.Config.GetIntValue("ddrop_inventory_refreshrate", 2);
 
                 try
                 {
