@@ -26,14 +26,22 @@ namespace DisconnectDrop
 
         public void OnPlayerJoin(PlayerJoinEvent ev)
         {
-            plugin.Info("Player joined, creating cache entries.");
             inventories.Add(ev.Player.SteamId, new List<Smod2.API.Item>());
             locations.Add(ev.Player.SteamId, new List<float>() {0, 0, 0} );
         }
 
         public void OnDisconnect(DisconnectEvent ev)
         {
-            plugin.Info("Player disconnected, searching for player...");
+            System.Threading.Thread myThread = new System.Threading.Thread(new System.Threading.ThreadStart(RealDisconnectHandler));
+            myThread.Start();
+        }
+
+        private void RealDisconnectHandler()
+        {
+            // bro this is so stupid. equivalent of setting a 500 ms timeout to read a response from a web request
+            // RIP functional OnDisconnect handler 2018-2018
+            System.Threading.Thread.Sleep(500);
+
             foreach (var inv in inventories)
             {
                 bool hasfound = false;
@@ -47,14 +55,16 @@ namespace DisconnectDrop
                 }
                 if (!hasfound)
                 {
-                    plugin.Info("Player found.");
                     // Drop player's cached inventory
                     foreach (var item in inv.Value)
                     {
                         var loc = locations[inv.Key];
-                        plugin.Info("Dropping at location " + loc[0] + ":" + loc[1] + ":" + loc[2]);
-                        item.SetPosition(new Smod2.API.Vector( loc[0], loc[1], loc[2] ));
-                        item.Drop();
+
+                        plugin.Server.Map.SpawnItem(
+                            item.ItemType,
+                            new Smod2.API.Vector(loc[0], loc[1], loc[2]),
+                            Smod2.API.Vector.Zero
+                        );
                     }
 
                     // Remove player entries
@@ -75,6 +85,7 @@ namespace DisconnectDrop
 
                 try
                 {
+                    // Update cached information
                     var players = plugin.Server.GetPlayers();
                     for (int i = 0; i < players.Count; i++)
                     {

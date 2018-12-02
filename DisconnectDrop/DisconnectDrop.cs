@@ -34,7 +34,7 @@ namespace DisconnectDrop
             this.AddConfig(new ConfigSetting("ddrop_inventory_refreshrate", 1, SettingType.NUMERIC, true, "How often player inventories are cached (in seconds)."));
 
             // Register events
-            this.AddEventHandlers(new DisconnectEventHandler(this), Priority.Normal);
+            this.AddEventHandlers(new DisconnectEventHandler(this));
         }
     }
 }
