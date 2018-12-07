@@ -11,7 +11,7 @@ namespace DisconnectDrop
         name = "DisconnectDrop",
         description = "Drops player items on disconnection.",
         id = "xyz.wizardlywonders.DisconnectDrop",
-        version = "1.1",
+        version = "1.2",
         SmodMajor = 3,
         SmodMinor = 1,
         SmodRevision = 22
