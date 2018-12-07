@@ -7,7 +7,7 @@ using System;
 
 namespace DisconnectDrop
 {
-    class DisconnectEventHandler : IEventHandlerPlayerJoin, IEventHandlerDisconnect, IEventHandlerRoundRestart, IEventHandlerFixedUpdate
+    class MiscEventHandler : IEventHandlerPlayerJoin, IEventHandlerDisconnect, IEventHandlerRoundRestart, IEventHandlerFixedUpdate
     {
         private Plugin plugin;
 
@@ -15,7 +15,7 @@ namespace DisconnectDrop
         public Dictionary<string, List<Smod2.API.Item>> inventories; // steamId: inventory
         public Dictionary<string, List<float>> locations;            // steamId: x, y, z
 
-        public DisconnectEventHandler(Plugin plugin)
+        public MiscEventHandler(Plugin plugin)
         {
             this.plugin = plugin;
 
