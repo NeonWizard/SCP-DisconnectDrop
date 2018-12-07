@@ -7,7 +7,7 @@ using System;
 
 namespace DisconnectDrop
 {
-    class DisconnectEventHandler : IEventHandlerPlayerJoin, IEventHandlerDisconnect, IEventHandlerFixedUpdate
+    class DisconnectEventHandler : IEventHandlerPlayerJoin, IEventHandlerDisconnect, IEventHandlerRoundRestart, IEventHandlerFixedUpdate
     {
         private Plugin plugin;
 
@@ -26,8 +26,8 @@ namespace DisconnectDrop
 
         public void OnPlayerJoin(PlayerJoinEvent ev)
         {
-            inventories.Add(ev.Player.SteamId, new List<Smod2.API.Item>());
-            locations.Add(ev.Player.SteamId, new List<float>() {0, 0, 0} );
+            inventories[ev.Player.SteamId] = new List<Smod2.API.Item>();
+            locations[ev.Player.SteamId] = new List<float>() { 0, 0, 0 };
         }
 
         public void OnDisconnect(DisconnectEvent ev)
@@ -73,6 +73,12 @@ namespace DisconnectDrop
                     break;
                 }
             }
+        }
+
+        public void OnRoundRestart(RoundRestartEvent ev)
+        {
+            this.inventories = new Dictionary<string, List<Smod2.API.Item>>();
+            this.locations = new Dictionary<string, List<float>>();
         }
 
         public void OnFixedUpdate(FixedUpdateEvent ev)

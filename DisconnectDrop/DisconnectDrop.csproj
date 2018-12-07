@@ -48,7 +48,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DisconnectEventHandler.cs" />
+    <Compile Include="MiscEventHandler.cs" />
     <Compile Include="DisconnectDrop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
