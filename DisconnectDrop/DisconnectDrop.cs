@@ -11,7 +11,7 @@ namespace DisconnectDrop
         name = "DisconnectDrop",
         description = "Drops player items on disconnection.",
         id = "xyz.wizardlywonders.DisconnectDrop",
-        version = "1.2",
+        version = "1.3",
         SmodMajor = 3,
         SmodMinor = 1,
         SmodRevision = 22
@@ -33,7 +33,7 @@ namespace DisconnectDrop
             this.AddConfig(new ConfigSetting("ddrop_inventory_refreshrate", 2, SettingType.NUMERIC, true, "How often player inventories are cached (in seconds)."));
 
             // Register events
-            this.AddEventHandlers(new MiscEventHandler(this), Smod2.Events.Priority.Highest);
+            this.AddEventHandlers(new MiscEventHandler(this), Priority.Highest);
         }
     }
 }
