@@ -1,38 +1,34 @@
 using Smod2;
+using Smod2.API;
 using Smod2.Events;
 using Smod2.EventHandlers;
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.Threading;
+using System.Linq;
 
 namespace DisconnectDrop
 {
     class MiscEventHandler : IEventHandlerPlayerJoin, IEventHandlerDisconnect, IEventHandlerRoundRestart, IEventHandlerFixedUpdate
     {
-        private Plugin plugin;
+        private readonly DisconnectDrop plugin;
 
-        private float pTime;
-        public Dictionary<string, List<Smod2.API.Item>> inventories; // steamId: inventory
-        public Dictionary<string, List<float>> locations;            // steamId: x, y, z
+        private float pTime = 0;
+		public Dictionary<string, List<Item>> inventories = new Dictionary<string, List<Item>>(); // steamId: inventory
+        public Dictionary<string, Vector> locations = new Dictionary<string, Vector>();          // steamId: x, y, z
 
-        public MiscEventHandler(Plugin plugin)
+		public MiscEventHandler(DisconnectDrop plugin) => this.plugin = plugin;
+
+		public void OnPlayerJoin(PlayerJoinEvent ev)
         {
-            this.plugin = plugin;
-
-            this.pTime = 0;
-            this.inventories = new Dictionary<string, List<Smod2.API.Item>>();
-            this.locations = new Dictionary<string, List<float>>();
-        }
-
-        public void OnPlayerJoin(PlayerJoinEvent ev)
-        {
-            inventories[ev.Player.SteamId] = new List<Smod2.API.Item>();
-            locations[ev.Player.SteamId] = new List<float>() { 0, 0, 0 };
+            inventories[ev.Player.SteamId] = new List<Item>();
+            locations[ev.Player.SteamId] = new Vector( 0, 0, 0 );
         }
 
         public void OnDisconnect(DisconnectEvent ev)
         {
-            System.Threading.Thread myThread = new System.Threading.Thread(new System.Threading.ThreadStart(RealDisconnectHandler));
+            Thread myThread = new Thread(new ThreadStart(RealDisconnectHandler));
             myThread.Start();
         }
 
@@ -40,7 +36,7 @@ namespace DisconnectDrop
         {
             // bro this is so stupid. equivalent of setting a 500 ms timeout to read a response from a web request
             // RIP functional OnDisconnect handler 2018-2018
-            System.Threading.Thread.Sleep(500);
+            Thread.Sleep(500);
 
             foreach (var inv in inventories)
             {
@@ -62,8 +58,8 @@ namespace DisconnectDrop
 
                         plugin.Server.Map.SpawnItem(
                             item.ItemType,
-                            new Smod2.API.Vector(loc[0], loc[1], loc[2]),
-                            Smod2.API.Vector.Zero
+                            loc,
+                            Vector.Zero
                         );
                     }
 
@@ -77,9 +73,23 @@ namespace DisconnectDrop
 
         public void OnRoundRestart(RoundRestartEvent ev)
         {
-            this.inventories = new Dictionary<string, List<Smod2.API.Item>>();
-            this.locations = new Dictionary<string, List<float>>();
+            this.inventories = new Dictionary<string, List<Item>>();
+            this.locations = new Dictionary<string, Vector>();
         }
+
+		private int refreshRate = 2;
+		private DateTime refreshCheck = DateTime.Now.AddSeconds(-1);
+
+		internal int GetInvRefreshRate()
+		{
+			if (refreshCheck < DateTime.Now)
+			{
+				refreshRate = plugin.GetConfigInt("ddrop_inventory_refreshrate");
+				refreshCheck = DateTime.Now.AddSeconds(20);
+			}
+			return refreshRate;
+		}
+
 
         public void OnFixedUpdate(FixedUpdateEvent ev)
         {
@@ -87,19 +97,21 @@ namespace DisconnectDrop
             pTime -= Time.fixedDeltaTime;
             if (pTime < 0)
             {
-                pTime = ConfigManager.Manager.Config.GetIntValue("ddrop_inventory_refreshrate", 2);
+				pTime = GetInvRefreshRate();
 
                 try
                 {
                     // Update cached information
-                    var players = plugin.Server.GetPlayers();
+                    var players = 
+						plugin.Server.GetPlayers()
+						.Where(p => p.TeamRole.Role != Role.SPECTATOR && p.TeamRole.Role != Role.UNASSIGNED)
+						.ToList();
                     for (int i = 0; i < players.Count; i++)
                     {
                         var player = players[i];
-                        var obj = (GameObject)player.GetGameObject();
 
                         inventories[player.SteamId] = player.GetInventory();
-                        locations[player.SteamId] = new List<float>{ obj.transform.position.x, obj.transform.position.y, obj.transform.position.z };
+                        locations[player.SteamId] = player.GetPosition();
                     };
                 }
                 catch (Exception e)
