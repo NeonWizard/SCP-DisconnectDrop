@@ -15,12 +15,12 @@ namespace DisconnectDrop
         private readonly DisconnectDrop plugin;
 
         private float pTime = 0;
-		public Dictionary<string, List<Item>> inventories = new Dictionary<string, List<Item>>(); // steamId: inventory
+        public Dictionary<string, List<Item>> inventories = new Dictionary<string, List<Item>>(); // steamId: inventory
         public Dictionary<string, Vector> locations = new Dictionary<string, Vector>();          // steamId: x, y, z
 
-		public MiscEventHandler(DisconnectDrop plugin) => this.plugin = plugin;
+        public MiscEventHandler(DisconnectDrop plugin) => this.plugin = plugin;
 
-		public void OnPlayerJoin(PlayerJoinEvent ev)
+        public void OnPlayerJoin(PlayerJoinEvent ev)
         {
             inventories[ev.Player.SteamId] = new List<Item>();
             locations[ev.Player.SteamId] = Vector.Zero;
@@ -77,18 +77,18 @@ namespace DisconnectDrop
             this.locations = new Dictionary<string, Vector>();
         }
 
-		private int refreshRate = 2;
-		private DateTime refreshCheck = DateTime.Now.AddSeconds(-1);
+        private int refreshRate = 2;
+        private DateTime refreshCheck = DateTime.Now.AddSeconds(-1);
 
-		internal int GetInvRefreshRate()
-		{
-			if (refreshCheck < DateTime.Now)
-			{
-				refreshRate = plugin.GetConfigInt("ddrop_inventory_refreshrate");
-				refreshCheck = DateTime.Now.AddSeconds(20);
-			}
-			return refreshRate;
-		}
+        internal int GetInvRefreshRate()
+        {
+            if (refreshCheck < DateTime.Now)
+            {
+                refreshRate = plugin.GetConfigInt("ddrop_inventory_refreshrate");
+                refreshCheck = DateTime.Now.AddSeconds(20);
+            }
+            return refreshRate;
+        }
 
 
         public void OnFixedUpdate(FixedUpdateEvent ev)
@@ -97,15 +97,15 @@ namespace DisconnectDrop
             pTime -= Time.fixedDeltaTime;
             if (pTime < 0)
             {
-				pTime = GetInvRefreshRate();
+                pTime = GetInvRefreshRate();
 
                 try
                 {
                     // Update cached information
                     var players = 
-						plugin.Server.GetPlayers()
-						.Where(p => p.TeamRole.Role != Role.SPECTATOR && p.TeamRole.Role != Role.UNASSIGNED)
-						.ToList();
+                        plugin.Server.GetPlayers()
+                        .Where(p => p.TeamRole.Role != Role.SPECTATOR && p.TeamRole.Role != Role.UNASSIGNED)
+                        .ToList();
                     for (int i = 0; i < players.Count; i++)
                     {
                         var player = players[i];
