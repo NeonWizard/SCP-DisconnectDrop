@@ -23,7 +23,7 @@ namespace DisconnectDrop
 		public void OnPlayerJoin(PlayerJoinEvent ev)
         {
             inventories[ev.Player.SteamId] = new List<Item>();
-            locations[ev.Player.SteamId] = new Vector( 0, 0, 0 );
+            locations[ev.Player.SteamId] = Vector.Zero;
         }
 
         public void OnDisconnect(DisconnectEvent ev)
