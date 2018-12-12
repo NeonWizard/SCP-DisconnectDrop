@@ -16,7 +16,7 @@ namespace DisconnectDrop
 
 		private float pTime = 0;
 		public Dictionary<string, List<Item>> inventories = new Dictionary<string, List<Item>>(); // steamId: inventory
-		public Dictionary<string, Vector> locations = new Dictionary<string, Vector>();          // steamId: x, y, z
+		public Dictionary<string, Vector> locations = new Dictionary<string, Vector>();           // steamId: position
 
 		public MiscEventHandler(DisconnectDrop plugin) => this.plugin = plugin;
 
