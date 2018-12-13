@@ -11,7 +11,7 @@ namespace DisconnectDrop
 		name = "DisconnectDrop",
 		description = "Drops player items on disconnection.",
 		id = "xyz.wizardlywonders.DisconnectDrop",
-		version = "1.4",
+		version = "1.5",
 		SmodMajor = 3,
 		SmodMinor = 1,
 		SmodRevision = 22
@@ -20,6 +20,7 @@ namespace DisconnectDrop
 	{
 		public override void OnDisable()
 		{
+			this.Info("DisconnectDrop has been disabled.");
 		}
 
 		public override void OnEnable()
@@ -30,10 +31,14 @@ namespace DisconnectDrop
 		public override void Register()
 		{
 			// Register config settings
+			this.AddConfig(new ConfigSetting("ddrop_enable", true, SettingType.BOOL, true, "Whether DisconnectDrop should be enabled on server start."));
 			this.AddConfig(new ConfigSetting("ddrop_inventory_refreshrate", 2, SettingType.NUMERIC, true, "How often player inventories are cached (in seconds)."));
 
 			// Register events
 			this.AddEventHandlers(new MiscEventHandler(this), Priority.Highest);
+
+			// Register commands
+			this.AddCommand("ddropdisable", new DDropDisableCommand(this));
 		}
 	}
 }

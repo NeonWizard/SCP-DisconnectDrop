@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace DisconnectDrop
 {
-	class MiscEventHandler : IEventHandlerPlayerJoin, IEventHandlerDisconnect, IEventHandlerRoundRestart, IEventHandlerFixedUpdate
+	class MiscEventHandler : IEventHandlerPlayerJoin, IEventHandlerDisconnect, IEventHandlerRoundRestart, IEventHandlerFixedUpdate, IEventHandlerWaitingForPlayers
 	{
 		private readonly DisconnectDrop plugin;
 
@@ -19,6 +19,11 @@ namespace DisconnectDrop
 		public Dictionary<string, Vector> locations = new Dictionary<string, Vector>();           // steamId: position
 
 		public MiscEventHandler(DisconnectDrop plugin) => this.plugin = plugin;
+
+		public void OnWaitingForPlayers(WaitingForPlayersEvent ev)
+		{
+			if (!ConfigManager.Manager.Config.GetBoolValue("ddrop_enable", true)) this.plugin.pluginManager.DisablePlugin(plugin);
+		}
 
 		public void OnPlayerJoin(PlayerJoinEvent ev)
 		{
