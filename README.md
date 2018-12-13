@@ -7,9 +7,15 @@ A simple plugin for SCP:SL Smod2 servers, which drops a player's inventory in th
 1. Grab the [latest release](https://github.com/NeonWizard/SCP-DisconnectDrop/releases/latest) of DisconnectDrop.
 2) Place DisconnectDrop.dll in your server's `sm_plugins` folder.
 
+# Commands
+Command | Value Type | Description
+--- | :---: | ---
+DDROPDISABLE | | **Disables the DisconnectDrop plugin.** Server will need to restart to enable it again.
+
 # Configuration
 Config Option | Value Type | Default Value | Description
 --- | :---: | :---: | ---
+ddrop_enable | Bool | True | Whether DisconnectDrop should be enabled on server start.
 ddrop_inventory_refreshrate | Int | 2 | How often player inventories are cached (in seconds).
 
 *Note that all configs should go in your server config file, not config_remoteadmin.txt
