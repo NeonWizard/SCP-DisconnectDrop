@@ -132,7 +132,7 @@ namespace DisconnectDrop
 				}
 				catch (Exception e)
 				{
-					plugin.Info(e.StackTrace);
+					plugin.Error(e.StackTrace);
 				}
 			}
 		}

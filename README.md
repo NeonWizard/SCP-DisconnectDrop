@@ -5,7 +5,7 @@ A simple plugin for SCP:SL Smod2 servers, which drops a player's inventory in th
 **[Smod2](https://github.com/Grover-c13/Smod2) must be installed for this to work.**
 
 1. Grab the [latest release](https://github.com/NeonWizard/SCP-DisconnectDrop/releases/latest) of DisconnectDrop.
-2) Place DisconnectDrop.dll in your server's `sm_plugins` folder.
+2. Place DisconnectDrop.dll in your server's `sm_plugins` folder.
 
 ## Commands
 Command | Value Type | Description
