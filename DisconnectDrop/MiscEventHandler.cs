@@ -22,7 +22,7 @@ namespace DisconnectDrop
 
 		public void OnWaitingForPlayers(WaitingForPlayersEvent ev)
 		{
-			if (!ConfigManager.Manager.Config.GetBoolValue("ddrop_enable", true)) this.plugin.pluginManager.DisablePlugin(plugin);
+			if (!this.plugin.GetConfigBool("ddrop_enable")) this.plugin.pluginManager.DisablePlugin(plugin);
 		}
 
 		public void OnPlayerJoin(PlayerJoinEvent ev)
