@@ -10,19 +10,32 @@ using System.Linq;
 
 namespace DisconnectDrop
 {
-	class MiscEventHandler : IEventHandlerPlayerJoin, IEventHandlerDisconnect, IEventHandlerRoundRestart, IEventHandlerFixedUpdate, IEventHandlerWaitingForPlayers
+	class MiscEventHandler : IEventHandlerPlayerJoin, IEventHandlerDisconnect, IEventHandlerFixedUpdate, IEventHandlerWaitingForPlayers, IEventHandlerRoundEnd
 	{
 		private readonly DisconnectDrop plugin;
 
-		private float pTime = 0;
-		public Dictionary<string, List<Item>> inventories = new Dictionary<string, List<Item>>(); // steamId: inventory
-		public Dictionary<string, Vector> locations = new Dictionary<string, Vector>();           // steamId: position
+		private float pTime;
+		public Dictionary<string, List<Item>> inventories; // steamId: inventory
+		public Dictionary<string, Vector> locations;       // steamId: position
+		bool roundOver;
 
 		public MiscEventHandler(DisconnectDrop plugin) => this.plugin = plugin;
 
 		public void OnWaitingForPlayers(WaitingForPlayersEvent ev)
 		{
 			if (!this.plugin.GetConfigBool("ddrop_enable")) this.plugin.pluginManager.DisablePlugin(plugin);
+
+			this.inventories = new Dictionary<string, List<Item>>();
+			this.locations = new Dictionary<string, Vector>();
+
+			this.pTime = 0;
+			this.roundOver = false;
+		}
+
+		// this is crucial so inventories aren't mass-dropped on server restart
+		public void OnRoundEnd(RoundEndEvent ev)
+		{
+			this.roundOver = true;
 		}
 
 		public void OnPlayerJoin(PlayerJoinEvent ev)
@@ -33,6 +46,8 @@ namespace DisconnectDrop
 
 		public void OnDisconnect(DisconnectEvent ev)
 		{
+			if (this.roundOver) return;
+
 			Thread myThread = new Thread(new ThreadStart(RealDisconnectHandler));
 			myThread.Start();
 		}
@@ -76,11 +91,6 @@ namespace DisconnectDrop
 			}
 		}
 
-		public void OnRoundRestart(RoundRestartEvent ev)
-		{
-			this.inventories = new Dictionary<string, List<Item>>();
-			this.locations = new Dictionary<string, Vector>();
-		}
 
 		private int refreshRate = 2;
 		private DateTime refreshCheck = DateTime.Now.AddSeconds(-1);
