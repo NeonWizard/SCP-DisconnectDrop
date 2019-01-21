@@ -108,6 +108,8 @@ namespace DisconnectDrop
 
 		public void OnFixedUpdate(FixedUpdateEvent ev)
 		{
+			if (this.roundOver) return;
+
 			// Update cached list of all player inventories every ddrop_inventory_refreshrate seconds
 			pTime -= Time.fixedDeltaTime;
 			if (pTime < 0)
