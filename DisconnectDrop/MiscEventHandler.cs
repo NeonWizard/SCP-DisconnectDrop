@@ -71,6 +71,8 @@ namespace DisconnectDrop
 			// RIP functional OnDisconnect handler 2018-2018
 			Thread.Sleep(500);
 
+			if (plugin.Server == null) return;
+
 			foreach (var inv in inventories)
 			{
 				bool hasfound = false;
@@ -121,16 +123,16 @@ namespace DisconnectDrop
 
 		public void OnFixedUpdate(FixedUpdateEvent ev)
 		{
-			if (this.roundOver) return;
+			if (this.roundOver || this.plugin.Server == null) return;
 
 			// Update cached list of all player inventories every ddrop_inventory_refreshrate seconds
 			pTime -= Time.fixedDeltaTime;
-			if (pTime < 0)
+			if (pTime <= 0)
 			{
-				pTime = GetInvRefreshRate();
-
 				try
 				{
+					pTime = GetInvRefreshRate();
+
 					// Update cached information
 					var players = plugin.Server
 						.GetPlayers()
@@ -147,6 +149,7 @@ namespace DisconnectDrop
 				}
 				catch (Exception e)
 				{
+					plugin.Info("ERROR CAUGHT, OUTPUTTING...");
 					plugin.Error(e.StackTrace);
 				}
 			}
