@@ -10,14 +10,15 @@ using System.Linq;
 
 namespace DisconnectDrop
 {
-	class MiscEventHandler : IEventHandlerPlayerJoin, IEventHandlerDisconnect, IEventHandlerFixedUpdate, IEventHandlerWaitingForPlayers, IEventHandlerRoundEnd
+	class MiscEventHandler : IEventHandlerPlayerJoin, IEventHandlerDisconnect, IEventHandlerFixedUpdate, IEventHandlerWaitingForPlayers, IEventHandlerRoundEnd, IEventHandlerRoundStart
 	{
 		private readonly DisconnectDrop plugin;
 
-		private float pTime;
-		public Dictionary<string, List<Item>> inventories; // steamId: inventory
-		public Dictionary<string, Vector> locations;       // steamId: position
-		bool roundOver;
+		private float pTime = 0;
+		private bool roundOver = true;
+
+		public Dictionary<string, List<Item>> inventories = new Dictionary<string, List<Item>>(); // steamId: inventory
+		public Dictionary<string, Vector> locations = new Dictionary<string, Vector>();           // steamId: position
 
 		public MiscEventHandler(DisconnectDrop plugin) => this.plugin = plugin;
 
@@ -29,13 +30,17 @@ namespace DisconnectDrop
 			this.locations = new Dictionary<string, Vector>();
 
 			this.pTime = 0;
-			this.roundOver = false;
 		}
 
 		// this is crucial so inventories aren't mass-dropped on server restart
 		public void OnRoundEnd(RoundEndEvent ev)
 		{
 			this.roundOver = true;
+		}
+
+		public void OnRoundStart(RoundStartEvent ev)
+		{
+			this.roundOver = false;
 		}
 
 		public void OnPlayerJoin(PlayerJoinEvent ev)
