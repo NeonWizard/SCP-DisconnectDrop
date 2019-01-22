@@ -14,22 +14,29 @@ namespace DisconnectDrop
 	{
 		private readonly DisconnectDrop plugin;
 
+		private bool debugging;
+
 		private float pTime = 0;
 		private bool roundOver = true;
 
 		public Dictionary<string, List<Item>> inventories = new Dictionary<string, List<Item>>(); // steamId: inventory
 		public Dictionary<string, Vector> locations = new Dictionary<string, Vector>();           // steamId: position
 
-		public MiscEventHandler(DisconnectDrop plugin) => this.plugin = plugin;
+		public MiscEventHandler(DisconnectDrop plugin)
+		{
+			this.plugin = plugin;
+			this.debugging = this.plugin.GetConfigBool("ddrop_debug");
+		}
 
 		public void OnWaitingForPlayers(WaitingForPlayersEvent ev)
 		{
 			if (!this.plugin.GetConfigBool("ddrop_enable")) this.plugin.pluginManager.DisablePlugin(plugin);
 
+			// refresh these on round restart
 			this.inventories = new Dictionary<string, List<Item>>();
 			this.locations = new Dictionary<string, Vector>();
 
-			this.pTime = 0;
+			this.debugging = this.plugin.GetConfigBool("ddrop_debug");
 		}
 
 		// this is crucial so inventories aren't mass-dropped on server restart
@@ -53,6 +60,7 @@ namespace DisconnectDrop
 		{
 			if (this.roundOver) return;
 
+			this.Debug("Dropping player inventory.");
 			Thread myThread = new Thread(new ThreadStart(RealDisconnectHandler));
 			myThread.Start();
 		}
@@ -142,6 +150,13 @@ namespace DisconnectDrop
 					plugin.Error(e.StackTrace);
 				}
 			}
+		}
+
+		private void Debug(string str)
+		{
+			if (!this.debugging) return;
+
+			this.plugin.Info("DEBUG: " + str);
 		}
 	}
 }
