@@ -33,7 +33,7 @@ namespace DisconnectDrop
 			// Register config settings
 			this.AddConfig(new ConfigSetting("ddrop_enable", true, SettingType.BOOL, true, "Whether DisconnectDrop should be enabled on server start."));
 			this.AddConfig(new ConfigSetting("ddrop_debug", false, SettingType.BOOL, true, "Enables debugging output for DisconnectDrop."));
-			this.AddConfig(new ConfigSetting("ddrop_inventory_refreshrate", 5, SettingType.NUMERIC, true, "How often player inventories are cached (in seconds)."));
+			this.AddConfig(new ConfigSetting("ddrop_inventory_refreshrate", 3, SettingType.NUMERIC, true, "How often player inventories are cached (in seconds)."));
 
 			// Register events
 			this.AddEventHandlers(new MiscEventHandler(this), Priority.Highest);
