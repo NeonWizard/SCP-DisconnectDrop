@@ -10,22 +10,35 @@ using System.Linq;
 
 namespace DisconnectDrop
 {
+	struct CachedPlayer
+	{
+		public List<Item> inventory;
+		public Vector position;
+
+		public CachedPlayer(List<Item> inv, Vector pos)
+		{
+			this.inventory = inv;
+			this.position = pos;
+		}
+	}
+
 	class MiscEventHandler : IEventHandlerPlayerJoin, IEventHandlerDisconnect, IEventHandlerFixedUpdate, IEventHandlerWaitingForPlayers, IEventHandlerRoundEnd, IEventHandlerRoundStart
 	{
 		private readonly DisconnectDrop plugin;
 
 		private bool debugging;
+		private int refreshRate;
 
 		private float pTime = 0;
 		private bool roundOver = true;
 
-		public Dictionary<string, List<Item>> inventories = new Dictionary<string, List<Item>>(); // steamId: inventory
-		public Dictionary<string, Vector> locations = new Dictionary<string, Vector>();           // steamId: position
+		public Dictionary<string, CachedPlayer> cachedPlayers = new Dictionary<string, CachedPlayer>();
 
 		public MiscEventHandler(DisconnectDrop plugin)
 		{
 			this.plugin = plugin;
 			this.debugging = this.plugin.GetConfigBool("ddrop_debug");
+			this.refreshRate = this.plugin.GetConfigInt("ddrop_inventory_refreshrate");
 		}
 
 		public void OnWaitingForPlayers(WaitingForPlayersEvent ev)
@@ -33,9 +46,7 @@ namespace DisconnectDrop
 			if (!this.plugin.GetConfigBool("ddrop_enable")) this.plugin.pluginManager.DisablePlugin(plugin);
 
 			// refresh these on round restart
-			this.inventories = new Dictionary<string, List<Item>>();
-			this.locations = new Dictionary<string, Vector>();
-
+			this.cachedPlayers = new Dictionary<string, CachedPlayer>();
 			this.debugging = this.plugin.GetConfigBool("ddrop_debug");
 		}
 
@@ -52,8 +63,7 @@ namespace DisconnectDrop
 
 		public void OnPlayerJoin(PlayerJoinEvent ev)
 		{
-			inventories[ev.Player.SteamId] = new List<Item>();
-			locations[ev.Player.SteamId] = Vector.Zero;
+			cachedPlayers[ev.Player.SteamId] = new CachedPlayer(new List<Item>(), Vector.Zero);
 		}
 
 		public void OnDisconnect(DisconnectEvent ev)
@@ -73,12 +83,12 @@ namespace DisconnectDrop
 
 			if (plugin.Server == null) return;
 
-			foreach (var inv in inventories)
+			foreach (var cplaya in this.cachedPlayers)
 			{
 				bool hasfound = false;
 				foreach (var player in plugin.Server.GetPlayers())
 				{
-					if (player.SteamId == inv.Key)
+					if (player.SteamId == cplaya.Key)
 					{
 						hasfound = true;
 						break;
@@ -87,9 +97,9 @@ namespace DisconnectDrop
 				if (!hasfound)
 				{
 					// Drop player's cached inventory
-					foreach (var item in inv.Value)
+					foreach (var item in cplaya.Value.inventory)
 					{
-						var loc = locations[inv.Key];
+						var loc = cplaya.Value.position;
 
 						plugin.Server.Map.SpawnItem(
 							item.ItemType,
@@ -98,28 +108,13 @@ namespace DisconnectDrop
 						);
 					}
 
-					// Remove player entries
-					inventories.Remove(inv.Key);
-					locations.Remove(inv.Key);
+					// Remove player entry
+					this.cachedPlayers.Remove(cplaya.Key);
+
 					break;
 				}
 			}
 		}
-
-
-		private int refreshRate = 2;
-		private DateTime refreshCheck = DateTime.Now.AddSeconds(-1);
-
-		internal int GetInvRefreshRate()
-		{
-			if (refreshCheck < DateTime.Now)
-			{
-				refreshRate = plugin.GetConfigInt("ddrop_inventory_refreshrate");
-				refreshCheck = DateTime.Now.AddSeconds(20);
-			}
-			return refreshRate;
-		}
-
 
 		public void OnFixedUpdate(FixedUpdateEvent ev)
 		{
@@ -131,7 +126,7 @@ namespace DisconnectDrop
 			{
 				try
 				{
-					pTime = GetInvRefreshRate();
+					pTime = this.refreshRate;
 
 					// Update cached information
 					var players = plugin.Server
@@ -143,8 +138,7 @@ namespace DisconnectDrop
 					{
 						var player = players[i];
 
-						inventories[player.SteamId] = player.GetInventory();
-						locations[player.SteamId] = player.GetPosition();
+						this.cachedPlayers[player.SteamId] = new CachedPlayer(player.GetInventory(), player.GetPosition());
 					};
 				}
 				catch (Exception e)
