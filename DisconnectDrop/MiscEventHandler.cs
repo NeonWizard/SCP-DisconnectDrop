@@ -63,7 +63,7 @@ namespace DisconnectDrop
 
 		public void OnPlayerJoin(PlayerJoinEvent ev)
 		{
-			cachedPlayers[ev.Player.SteamId] = new CachedPlayer(new List<Item>(), Vector.Zero);
+			this.cachedPlayers[ev.Player.SteamId] = new CachedPlayer(new List<Item>(), Vector.Zero);
 		}
 
 		public void OnDisconnect(DisconnectEvent ev)
@@ -131,13 +131,12 @@ namespace DisconnectDrop
 					// Update cached information
 					var players = plugin.Server
 						.GetPlayers()
-						.Where(p => p.TeamRole.Role != Role.SPECTATOR && p.TeamRole.Role != Role.UNASSIGNED)
+						//.Where(p => p.TeamRole.Role != Role.SPECTATOR && p.TeamRole.Role != Role.UNASSIGNED)
 						.ToList();
 
 					for (int i = 0; i < players.Count; i++)
 					{
 						var player = players[i];
-
 						this.cachedPlayers[player.SteamId] = new CachedPlayer(player.GetInventory(), player.GetPosition());
 					};
 				}
