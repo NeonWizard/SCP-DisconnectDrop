@@ -26,8 +26,7 @@ namespace DisconnectDrop
 	{
 		private readonly DisconnectDrop plugin;
 
-		private bool debugging;
-		private int refreshRate;
+		private readonly int refreshRate;
 
 		private float pTime = 0;
 		private bool roundOver = true;
@@ -37,7 +36,6 @@ namespace DisconnectDrop
 		public MiscEventHandler(DisconnectDrop plugin)
 		{
 			this.plugin = plugin;
-			this.debugging = this.plugin.GetConfigBool("ddrop_debug");
 			this.refreshRate = this.plugin.GetConfigInt("ddrop_inventory_refreshrate");
 		}
 
@@ -47,7 +45,6 @@ namespace DisconnectDrop
 
 			// refresh these on round restart
 			this.cachedPlayers = new Dictionary<string, CachedPlayer>();
-			this.debugging = this.plugin.GetConfigBool("ddrop_debug");
 		}
 
 		// this is crucial so inventories aren't mass-dropped on server restart
@@ -142,7 +139,7 @@ namespace DisconnectDrop
 				}
 				catch (Exception e)
 				{
-					plugin.Info("ERROR CAUGHT, OUTPUTTING...");
+					plugin.Debug("ERROR CAUGHT, OUTPUTTING...");
 					plugin.Error(e.StackTrace);
 				}
 			}
