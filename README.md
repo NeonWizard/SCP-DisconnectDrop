@@ -16,7 +16,7 @@ DDROPDISABLE | | **Disables the DisconnectDrop plugin.** Server will need to res
 Config Option | Value Type | Default Value | Description
 :---: | :---: | :---: | ---
 ddrop_enable | Bool | True | Whether DisconnectDrop should be enabled on server start.
-ddrop_config | Bool | False | Enables debugging output for DisconnectDrop.
+ddrop_debug | Bool | False | Enables debugging output for DisconnectDrop.
 ddrop_inventory_refreshrate | Int | 3 | How often player inventories are cached (in seconds).
 
 *Note that all configs should go in your server config file, not config_remoteadmin.txt
