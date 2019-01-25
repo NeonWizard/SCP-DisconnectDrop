@@ -70,7 +70,7 @@ namespace DisconnectDrop
 		{
 			if (this.roundOver) return;
 
-			this.Debug("Dropping player inventory.");
+			this.plugin.Debug("Dropping player inventory.");
 			Thread myThread = new Thread(new ThreadStart(RealDisconnectHandler));
 			myThread.Start();
 		}
@@ -146,13 +146,6 @@ namespace DisconnectDrop
 					plugin.Error(e.StackTrace);
 				}
 			}
-		}
-
-		private void Debug(string str)
-		{
-			if (!this.debugging) return;
-
-			this.plugin.Info("DEBUG: " + str);
 		}
 	}
 }

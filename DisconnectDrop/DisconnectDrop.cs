@@ -18,6 +18,8 @@ namespace DisconnectDrop
 	)]
 	class DisconnectDrop : Plugin
 	{
+		public bool? debugging = null;
+
 		public override void OnDisable()
 		{
 			this.Info("DisconnectDrop has been disabled.");
@@ -40,6 +42,14 @@ namespace DisconnectDrop
 
 			// Register commands
 			this.AddCommand("ddropdisable", new DDropDisableCommand(this));
+		}
+
+		public new void Debug(string str)
+		{
+			if (this.debugging == null) this.debugging = this.GetConfigBool("ddrop_debug");
+			if (this.debugging == false) return;
+
+			this.Info("DEBUG: " + str);
 		}
 	}
 }
